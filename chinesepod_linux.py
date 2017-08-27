@@ -45,6 +45,7 @@ def download_image(my_dir, url):
     with open(os.path.join(my_dir, image_filename), 'wb') as f:
         for chunk in res.iter_content(1024):
             f.write(chunk)
+    return image_filename
 
 def move_filetypes(source_dir, target_dir, filetypes):
     '''Move all files in list of filetypes from source to target'''
@@ -57,7 +58,6 @@ def move_filetypes(source_dir, target_dir, filetypes):
 
 root_dir = os.path.join(os.path.expanduser('~'), 'chinesepod')
 temp_dir = os.path.join(root_dir, 'downloads')
-old_dir = set(os.listdir(temp_dir))
 chrome_profile = webdriver.ChromeOptions()
 profile = { "download.default_directory": temp_dir,
             "plugins.plugins_list": [{"enabled":False, "name":"Chrome PDF Viewer"}]}                
@@ -71,9 +71,9 @@ urls = read_list_from_file(os.path.join(root_dir, 'chinesepod_urls.txt'))
 for url in urls:
     table = []
     driver.get(url+'#dialogue-tab')
-    print('Starting on {0}'.format(urls[0]))
+    print('Starting on {0}'.format(url))
     element = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'a.download-link')))
-    image_filename = download_image(temp_dir, urls[0])
+    image_filename = download_image(temp_dir, url)
     chinese = driver.find_elements_by_css_selector('p.font-chinese')
     english = driver.find_elements_by_css_selector('div.font-english')
     audio_files = driver.find_elements_by_css_selector('a.download-link')
@@ -82,17 +82,19 @@ for url in urls:
     print('English {0}'.format(len(english)))
     print('Audio Files {0}'.format(len(audio_files)))
 
+    
     for i in range(len(chinese)):
         chinese_text = chinese[i].text
         english_text = english[i].text.replace('show pinyin', '').replace('\n', '')
+        old_dir = set(os.listdir(temp_dir))
         driver.get(audio_files[i].get_attribute('href'))
-        time.sleep(3) # Selenium doesn't support waiting for downloads
+        time.sleep(5) # Selenium doesn't support waiting for downloads
         audio_filename = set(os.listdir(temp_dir)).difference(old_dir).pop()
         image_text = '<img src="{0}">'.format(image_filename)
         print('Downloaded {0} of {1}'.format(i+1, len(chinese)))
         table.append([chinese_text, english_text, '[sound:{0}]'.format(audio_filename), image_text])
     
-    tsv_filename = os.path.join(temp_dir, '{0}.tsv'.format(urls[0].split('/')[-1]))
+    tsv_filename = os.path.join(temp_dir, '{0}.tsv'.format(url.split('/')[-1]))
     with open(tsv_filename, 'w') as f:
         writer = csv.writer(f, delimiter='\t', quotechar='|')
         writer.writerows(table)
