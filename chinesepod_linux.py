@@ -86,7 +86,7 @@ for url in urls:
         chinese_text = chinese[i].text
         english_text = english[i].text.replace('show pinyin', '').replace('\n', '')
         driver.get(audio_files[i].get_attribute('href'))
-        time.sleep(5)
+        time.sleep(3) # Selenium doesn't support waiting for downloads
         audio_filename = set(os.listdir(temp_dir)).difference(old_dir).pop()
         image_text = '<img src="{0}">'.format(image_filename)
         print('Downloaded {0} of {1}'.format(i+1, len(chinese)))
