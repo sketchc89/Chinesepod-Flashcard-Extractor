@@ -32,14 +32,12 @@ def read_list_from_file(filename):
 
 def download_mp3(my_dir, url):
     mp3s = driver.find_elements_by_css_selector('a.list-group-item')
-    print(mp3s)
     for i, mp3 in enumerate(mp3s[1:]): #skip dashboard link
         src = mp3.get_attribute('href')
-        print(src)
         mp3_filename = '{0}_{1}.mp3'.format(url.split('/')[-1], i)
         if src:
             try:
-                print('Downloading mp3 {0}'.format(src))
+                print('Downloading mp3 {0}'.format(mp3_filename))
                 res = requests.get(src)
                 res.raise_for_status()
                 with open(os.path.join(my_dir, mp3_filename), 'wb') as f:
