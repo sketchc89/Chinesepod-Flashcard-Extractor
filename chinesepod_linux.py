@@ -14,7 +14,7 @@ def login(email, password):
     driver.get('https://chinesepod.com/accounts/signin')
     email_input = driver.find_element_by_id('email')    
     password_input = driver.find_element_by_id('password')
-    submit_input = driver.find_element_by_css_selector('button.btn-lg')
+    submit_input = driver.find_element_by_css_selector('button.btn.btn-lg.btn-red-border')
     email_input.send_keys(email)
     password_input.send_keys(password)
     submit_input.click()
