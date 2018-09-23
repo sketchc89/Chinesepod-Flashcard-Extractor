@@ -46,7 +46,10 @@ def download_mp3(my_dir, url):
                     for chunk in res.iter_content(1024):
                         f.write(chunk) 
             except requests.exceptions.MissingSchema:
-                print("Fail")
+                print("Fail, missing schema")
+                pass
+            except requests.exceptions.HTTPError:
+                print("Didn't find mp3 file at url")
                 pass
             
     return mp3_filename
